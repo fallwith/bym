@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+if [ "$#" -lt 2 ]; then
+  echo "Usage: $0 <root dir to process> <path to output file>"
+  exit -1
+fi
+root=$1
+output=$2
+
+function ensure_tool_exists() {
+  binary=$1
+  name=$2
+  if ! command -v "$binary">/dev/null; then
+    echo "The '$binary' tool was not found. Please install $name and try again."
+    exit 1
+  fi
+}
+ensure_tool_exists rg ripgrep
+ensure_tool_exists aspell aspell
+
+content=""
+for f in $(rg --files --hidden --follow --glob "!.git/*" "$root"); do
+  content="$content$(aspell --ignore-case --encoding utf-8 list < "$root/$f")"
+done
+
+export LC_ALL=C 
+echo "$content" | sort -uf > "$output"
