@@ -22,7 +22,7 @@ ensure_tool_exists aspell aspell
 
 content=""
 for f in $(rg --files --hidden --follow --glob "!.git/*" "$root"); do
-  content="$content$(aspell --ignore-case --encoding utf-8 list < "$root/$f")"
+  content="$content$(aspell --ignore-case --encoding utf-8 --run-together list < "$root/$f")"
 done
 
 export LC_ALL=C 
